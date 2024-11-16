@@ -15,6 +15,7 @@ export default function RootLayout() {
  
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Nithya : require('../assets/fonts/NithyaRanjanaDU-Regular.otf')
   });
 
   useEffect(() => {

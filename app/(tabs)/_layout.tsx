@@ -32,6 +32,15 @@ export default function Layout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="camera-outline" size={28} color={color} />
           ),
+          tabBarStyle: { display: 'none' }, // Hide tab bar when focused
+        }}
+        listeners={{
+          focus: () => {
+            setShowTabBar(false); // Hide tab bar when focused on voicelearn
+          },
+          blur: () => {
+            setShowTabBar(true); // Show tab bar when blurred from voicelearn
+          },
         }}
       />
       <Tabs.Screen name="letter"
@@ -80,6 +89,19 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen name="wordmatch" />
+      <Tabs.Screen name = "welcome"
+       options={{
+        tabBarStyle: { display: 'none' }, // Hide tab bar when focused
+      }}
+      listeners={{
+        focus: () => {
+          setShowTabBar(false); // Hide tab bar when focused on voicelearn
+        },
+        blur: () => {
+          setShowTabBar(true); // Show tab bar when blurred from voicelearn
+        },
+      }}
+      />
     </Tabs>
   );
 }

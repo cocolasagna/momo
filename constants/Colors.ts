@@ -5,6 +5,9 @@ export default{
     white : '#FFFFFF',
     grey : '#808080',
     blue : '#73C2FB',
-    green: '#98FB98'
+    green: 'rgba(46,89,13,0.07)',
+    darkgreen:'rgba(46,89,13, 0.7)',
+    red : 'rgba(149,21,21,0,0.07)',
+    darkred: 'rgba(149,21,21,0.7)',
 
 }

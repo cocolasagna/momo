@@ -10,9 +10,9 @@ import { useNavigation } from '@react-navigation/native'; // Navigation hook
 const VoicePage = () => {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [cardColors, setCardColors] = useState<{ [key: string]: string }>({
-    "Dog": "#f8f8f8",
+    "लः": "#f8f8f8",
     "Bag": "#f8f8f8",
-    "Money": "#f8f8f8",
+    "ख": "#f8f8f8",
     "Sujan": "#f8f8f8",
   });
   const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -25,17 +25,17 @@ const VoicePage = () => {
   const navigation = useNavigation();
 
   const soundFiles: { [key: string]: any } = {
-    apt: require("../../assets/sounds/apt.mp3"),
+    la: require("../../assets/sounds/la.mp3"),
     bag: require("../../assets/sounds/bag.mp3"),
     money: require("../../assets/sounds/money.mp3"),
     sujan: require("../../assets/sounds/sujan.mp3"),
   };
 
   const soundToTextMap: { [key: string]: string } = {
-    apt: "Dog",
-    bag: "Bag",
-    money: "Money",
-    sujan: "Sujan"
+    la: "लः",
+    bag: "क",
+    money: "ख",
+    sujan: "घ"
   };
 
   // Stop the current sound if it exists and then play the new one
@@ -58,30 +58,30 @@ const VoicePage = () => {
     }
   };
 
-  // Play a random sound and set the correct answer
-  const playRandomSound = async () => {
-    const randomKeys = Object.keys(soundToTextMap);
-    const randomKey = randomKeys[Math.floor(Math.random() * randomKeys.length)];
-
-    setCurrentSoundKey(randomKey); // Store the new sound key
-    setCorrectCard(soundToTextMap[randomKey]); // Set correct card
+  // Play the first sound and set the correct answer (no randomization)
+  const playFirstSound = async () => {
+    const firstKey = "la"; // Change this to the first sound you want to play
+    setCurrentSoundKey(firstKey); // Set the current sound key
+    setCorrectCard(soundToTextMap[firstKey]); // Set correct card for the first sound
 
     // Now play the sound
-    await stopAndPlaySound(randomKey); // Stop any existing sound and play the new one
+    await stopAndPlaySound(firstKey); // Stop any existing sound and play the first one
   };
 
   // Check the selected card against the correct card
   const checkCard = () => {
     if (selectedCard && correctCard) {
       const isCorrect = selectedCard === correctCard;
+
+      // Set the result of correctness immediately
       setIsAnswerCorrect(isCorrect);
       setMessage(isCorrect ? "Well Done!" : "Try Again");
-      setButtonText(isCorrect ? "Continue" : "Try Again");
+      setButtonText(isCorrect ? "Continue" : "Retry");
 
-      // Change card color based on correctness
+      // Change the background color of the selected card based on correctness
       setCardColors((prevColors) => ({
         ...prevColors,
-        [selectedCard]: isCorrect ? Colors.green : "red",
+        [selectedCard]: isCorrect ? Colors.green : "red", // Instant color change on selected card
       }));
     }
   };
@@ -96,38 +96,38 @@ const VoicePage = () => {
     }
   };
 
-  // Reset the game state and play a new random sound
+  // Reset the game state and play the first sound
   const resetGame = () => {
     setSelectedCard(null);
     setCardColors({
-      Dog: "#f8f8f8",
-      Bag: "#f8f8f8",
-      Money: "#f8f8f8",
-      Sujan: "#f8f8f8",
+      लः: "#f8f8f8",
+      क: "#f8f8f8",
+      ख: "#f8f8f8",
+      घ: "#f8f8f8",
     });
     setMessage("");
     setButtonText("Check");
     setIsAnswerCorrect(null);
-    playRandomSound(); // Play a new random sound after reset
+    playFirstSound(); // Play the first sound after reset
   };
 
   const reset = () => {
     setSelectedCard(null);
     setCardColors({
-      Dog: "#f8f8f8",
-      Bag: "#f8f8f8",
-      Money: "#f8f8f8",
-      Sujan: "#f8f8f8",
+      𑐮: "#f8f8f8",
+      क: "#f8f8f8",
+      ख: "#f8f8f8",
+      घ: "#f8f8f8",
     });
     setMessage("");
     setButtonText("Check");
     setIsAnswerCorrect(null);
-    // Play a new random sound after reset
+    // Do not play a sound after reset, but you can adjust this as needed
   };
 
   useEffect(() => {
     if (!currentSoundKey) {
-      playRandomSound(); // Initialize the game by playing a random sound if no sound is set
+      playFirstSound(); // Initialize the game by playing the first sound if no sound is set
     } else {
       playSound(); // Play the same sound if a sound key is already set
     }
@@ -148,10 +148,9 @@ const VoicePage = () => {
           headerLeft: () => (
             <TouchableOpacity onPress={() => {}} style={{ marginLeft: 20 }}>
               <Image
-                source={{
-                  uri: "https://xsgames.co/randomusers/avatar.php?g=male",
-                }}
+                source={require('../../assets/images/title.png')} // Update the path to your image
                 style={{ width: 40, height: 40, borderRadius: 10 }}
+                resizeMode="contain"
               />
             </TouchableOpacity>
           ),
@@ -173,8 +172,13 @@ const VoicePage = () => {
               key={index}
               style={[
                 styles.card,
-                { backgroundColor: cardColors[soundToTextMap[soundKey]] },
-                selectedCard === soundToTextMap[soundKey] && { borderWidth: 3, borderColor: Colors.blue } // Highlight selected card
+                { backgroundColor: cardColors[soundToTextMap[soundKey]] }, // This will reflect the updated color
+                selectedCard === soundToTextMap[soundKey] && { 
+                  borderWidth: 3, 
+                 
+                  borderColor:isAnswerCorrect === null ? "rgba(116,195,252,0.2)" : isAnswerCorrect ? Colors.darkgreen : Colors.darkred,
+                  backgroundColor: isAnswerCorrect === null ? "rgba(116,195,252,0.2)" : isAnswerCorrect ? Colors.green : Colors.red,
+                } // Highlight selected card with border and soft color if selected
               ]}
               onPress={() => setSelectedCard(soundToTextMap[soundKey])}
             >
@@ -183,13 +187,9 @@ const VoicePage = () => {
           ))}
         </View>
         
-        <View style={styles.messageContainer}>
-          <Text style={styles.messageText}>{message}</Text>
-        </View>
-
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, { backgroundColor: isAnswerCorrect === null ? Colors.blue : isAnswerCorrect ? Colors.darkgreen : Colors.darkred }]} // Button color change
             onPress={isAnswerCorrect === null ? checkCard : handleContinue} // Ensure sound does not play during check
           >
             <Text style={styles.buttonText}>{buttonText}</Text>
@@ -208,7 +208,6 @@ const styles = StyleSheet.create({
   },
   headingTxt: {
     fontSize: 30,
-    fontWeight: "900",
     color: Colors.black,
     marginTop: 10,
   },
@@ -219,10 +218,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: Colors.black,
-    shadowOffset: { width: 20, height: 10 },
-    shadowOpacity: 1,
-    shadowRadius: 5,
+ 
   },
   volume: {
     color: Colors.white,
@@ -242,49 +238,40 @@ const styles = StyleSheet.create({
   card: {
     width: "48%", // Each card takes up 48% of the container's width, leaving space for two cards per row
     height: 120,
-    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10, // Space between rows
-    shadowColor: Colors.black,
-    shadowOffset: { width: 20, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
+    borderRadius: 20,
+    marginVertical: 10,
+    shadowColor: Colors.grey,
+    borderWidth:2,
+    borderColor:Colors.grey,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   cardText: {
-    fontSize: 18,
-    fontWeight: "bold",
     color: Colors.black,
-  },
-  messageContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  messageText: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: Colors.black,
+    fontSize: 30,
+    fontFamily:'Nithya',
+    //fontWeight: "bold",
   },
   buttonContainer: {
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-   // gap: 20,
+    marginTop: 30,
   },
   button: {
-    backgroundColor: Colors.blue,
-    paddingVertical: 15,
-    paddingHorizontal: 25,
+    width: 200,
+    height: 50,
     borderRadius: 10,
-    justifyContent:'center',
-    alignItems:'center',
-    width:'100%'
-,  },
+    justifyContent: "center",
+    alignItems: "center",
+  },
   buttonText: {
-    fontSize: 18,
-    fontWeight: "600",
     color: Colors.white,
-
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

@@ -3,90 +3,85 @@ import { Stack } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av"; // Import Audio from expo-av
+import { Audio } from "expo-av"; 
 import Colors from "@/constants/Colors";
-import { useNavigation } from '@react-navigation/native'; // Navigation hook
+import { useNavigation } from '@react-navigation/native'; 
 
-const LetterPage = () => {
+const VoicePage = () => {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [cardColors, setCardColors] = useState<{ [key: string]: string }>({
-    "Dog": "#f8f8f8",
-    "Bag": "#f8f8f8",
-    "Money": "#f8f8f8",
-    "Sujan": "#f8f8f8",
+    "la": "#f8f8f8",
+    "bag": "#f8f8f8",
+    "money": "#f8f8f8",
+    "sujan": "#f8f8f8",
   });
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [correctCard, setCorrectCard] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
   const [buttonText, setButtonText] = useState("Check");
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
-  const [currentSoundKey, setCurrentSoundKey] = useState<string | null>(null); // To store the current sound
+  const [currentSoundKey, setCurrentSoundKey] = useState<string | null>(null); 
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation();
 
   const soundFiles: { [key: string]: any } = {
-    apt: require("../../assets/sounds/apt.mp3"),
+    la: require("../../assets/sounds/la.mp3"),
     bag: require("../../assets/sounds/bag.mp3"),
     money: require("../../assets/sounds/money.mp3"),
     sujan: require("../../assets/sounds/sujan.mp3"),
   };
 
-  const soundToImageMap: { [key: string]: any } = {
-    apt: require("../../assets/images/dog.png"),
+  const imageFiles: { [key: string]: any } = {
+    la: require("../../assets/images/la.png"),
     bag: require("../../assets/images/bag.png"),
     money: require("../../assets/images/money.png"),
     sujan: require("../../assets/images/person.png"),
   };
 
-  // Stop the current sound if it exists and then play the new one
-  const stopAndPlaySound = async (soundKey: string) => {
-    if (sound) {
-      await sound.stopAsync(); // Stop the current sound
-      await sound.unloadAsync(); // Unload it to free up resources
-    }
-
-    // Now play the new sound
-    const { sound: newSound } = await Audio.Sound.createAsync(soundFiles[soundKey]);
-    setSound(newSound); // Set the new sound to state
-    await newSound.playAsync(); // Play the new sound
+  const soundToTextMap: { [key: string]: string } = {
+    la: "लः",
+    bag: "क",
+    money: "ख",
+    sujan: "घ"
   };
 
-  // Play the sound based on currentSoundKey
+  const stopAndPlaySound = async (soundKey: string) => {
+    if (sound) {
+      await sound.stopAsync(); 
+      await sound.unloadAsync(); 
+    }
+
+    const { sound: newSound } = await Audio.Sound.createAsync(soundFiles[soundKey]);
+    setSound(newSound); 
+    await newSound.playAsync(); 
+  };
+
   const playSound = async () => {
     if (currentSoundKey && soundFiles[currentSoundKey]) {
       await stopAndPlaySound(currentSoundKey);
     }
   };
 
-  // Play a random sound and set the correct answer
-  const playRandomSound = async () => {
-    const randomKeys = Object.keys(soundToImageMap);
-    const randomKey = randomKeys[Math.floor(Math.random() * randomKeys.length)];
-
-    setCurrentSoundKey(randomKey); // Store the new sound key
-    setCorrectCard(randomKey); // Set correct card
-
-    // Now play the sound
-    await stopAndPlaySound(randomKey); // Stop any existing sound and play the new one
+  const playFirstSound = async () => {
+    const firstKey = "la"; 
+    setCurrentSoundKey(firstKey); 
+    setCorrectCard(soundToTextMap[firstKey]); 
+    await stopAndPlaySound(firstKey); 
   };
 
-  // Check the selected card against the correct card
   const checkCard = () => {
     if (selectedCard && correctCard) {
       const isCorrect = selectedCard === correctCard;
       setIsAnswerCorrect(isCorrect);
       setMessage(isCorrect ? "Well Done!" : "Try Again");
-      setButtonText(isCorrect ? "Continue" : "Try Again");
-
-      // Change card color based on correctness
+      setButtonText(isCorrect ? "Continue" : "Retry");
       setCardColors((prevColors) => ({
         ...prevColors,
-        [selectedCard]: isCorrect ? Colors.green : "red",
+        [selectedCard]: isCorrect ? Colors.green : "red", 
       }));
     }
   };
 
-  // Continue to the next screen or reset the game
   const handleContinue = () => {
     if (isAnswerCorrect) {
       navigation.navigate("wordmatch");
@@ -96,48 +91,46 @@ const LetterPage = () => {
     }
   };
 
-  // Reset the game state and play a new random sound
   const resetGame = () => {
     setSelectedCard(null);
     setCardColors({
-      Dog: "#f8f8f8",
-      Bag: "#f8f8f8",
-      Money: "#f8f8f8",
-      Sujan: "#f8f8f8",
+      la: "#f8f8f8",
+      bag: "#f8f8f8",
+      money: "#f8f8f8",
+      sujan: "#f8f8f8",
     });
     setMessage("");
     setButtonText("Check");
     setIsAnswerCorrect(null);
-    playRandomSound(); // Play a new random sound after reset
+    playFirstSound(); 
   };
 
   const reset = () => {
     setSelectedCard(null);
     setCardColors({
-      Dog: "#f8f8f8",
-      Bag: "#f8f8f8",
-      Money: "#f8f8f8",
-      Sujan: "#f8f8f8",
+      la: "#f8f8f8",
+      bag: "#f8f8f8",
+      money: "#f8f8f8",
+      sujan: "#f8f8f8",
     });
     setMessage("");
     setButtonText("Check");
     setIsAnswerCorrect(null);
-    // Play a new random sound after reset
   };
 
   useEffect(() => {
     if (!currentSoundKey) {
-      playRandomSound(); // Initialize the game by playing a random sound if no sound is set
+      playFirstSound(); 
     } else {
-      playSound(); // Play the same sound if a sound key is already set
+      playSound(); 
     }
 
     return () => {
       if (sound) {
-        sound.unloadAsync(); // Cleanup the sound when the component is unmounted
+        sound.unloadAsync(); 
       }
     };
-  }, [currentSoundKey]); // Re-run the effect when the currentSoundKey changes
+  }, [currentSoundKey]);
 
   return (
     <>
@@ -148,10 +141,9 @@ const LetterPage = () => {
           headerLeft: () => (
             <TouchableOpacity onPress={() => {}} style={{ marginLeft: 20 }}>
               <Image
-                source={{
-                  uri: "https://xsgames.co/randomusers/avatar.php?g=male",
-                }}
+                source={require('../../assets/images/title.png')} 
                 style={{ width: 40, height: 40, borderRadius: 10 }}
+                resizeMode="contain"
               />
             </TouchableOpacity>
           ),
@@ -161,39 +153,42 @@ const LetterPage = () => {
       <View style={[styles.container, { paddingTop: headerHeight + 10 }]}>
         <Text style={styles.headingTxt}>Select the Correct Image</Text>
 
-        <View style={styles.play}>
-          <TouchableOpacity onPress={playSound} style={styles.playsound}>
-            <Ionicons name="volume-medium" style={styles.volume} />
-          </TouchableOpacity>
-        </View>
+        <View style={[styles.play, { flexDirection: 'row', alignItems: 'center' }]}>
+  <TouchableOpacity onPress={playSound} style={{ marginRight: 10 }}>
+    <Ionicons name="volume-medium" style={styles.volume} />
+  </TouchableOpacity>
+  <Text style={styles.Txt}>लः</Text>
+</View>
+
 
         <View style={styles.cardRow}>
-          {Object.keys(soundToImageMap).map((soundKey, index) => (
+          {Object.keys(soundToTextMap).map((soundKey, index) => (
             <TouchableOpacity
               key={index}
               style={[
                 styles.card,
                 { backgroundColor: cardColors[soundKey] },
-                selectedCard === soundKey && { borderWidth: 3, borderColor: Colors.blue } // Highlight selected card
+                selectedCard === soundToTextMap[soundKey] && { 
+                  borderWidth: 3, 
+                  borderColor:isAnswerCorrect === null ? "rgba(116,195,252,0.2)" : isAnswerCorrect ? Colors.darkgreen : Colors.darkred,
+                  backgroundColor: isAnswerCorrect === null ? "rgba(116,195,252,0.2)" : isAnswerCorrect ? Colors.green : Colors.red,
+                } 
               ]}
-              onPress={() => setSelectedCard(soundKey)}
+              onPress={() => setSelectedCard(soundToTextMap[soundKey])}
             >
               <Image
-                source={soundToImageMap[soundKey]}
+                source={imageFiles[soundKey]}
                 style={styles.cardImage}
+                resizeMode="contain"
               />
             </TouchableOpacity>
           ))}
         </View>
         
-        <View style={styles.messageContainer}>
-          <Text style={styles.messageText}>{message}</Text>
-        </View>
-
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.button}
-            onPress={isAnswerCorrect === null ? checkCard : handleContinue} // Ensure sound does not play during check
+            style={[styles.button, { backgroundColor: isAnswerCorrect === null ? Colors.blue : isAnswerCorrect ? Colors.darkgreen : Colors.darkred }]}
+            onPress={isAnswerCorrect === null ? checkCard : handleContinue}
           >
             <Text style={styles.buttonText}>{buttonText}</Text>
           </TouchableOpacity>
@@ -211,85 +206,66 @@ const styles = StyleSheet.create({
   },
   headingTxt: {
     fontSize: 30,
-    fontWeight: "900",
     color: Colors.black,
     marginTop: 10,
   },
-  playsound: {
-    backgroundColor: Colors.blue,
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: Colors.black,
-    shadowOffset: { width: 20, height: 10 },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-  },
+  
   volume: {
-    color: Colors.white,
-    fontSize: 50,
+    color: Colors.blue,
+    fontSize: 30,
   },
   play: {
-    margin:10,
-    marginHorizontal:130
-   // justifyContent: "center",
-   // alignItems: "center",
+    marginTop:20,
+    paddingHorizontal:10    
+
   },
   cardRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between", // Ensures cards are spaced out evenly
-    marginTop: 50,
+    justifyContent: "space-between", 
+    marginTop: 20,
   },
   card: {
-    width: "45%", // Adjust width to fit cards on the screen
+    width: "45%",
     height: 150,
-    marginVertical: 10,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 20, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
+    borderRadius: 20,
+    marginVertical: 10,
+    shadowColor: Colors.grey,
+    borderWidth:2,
+    borderColor:Colors.grey,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   cardImage: {
-    width: "80%",
-    height: "80%",
-    resizeMode: "contain",
+    width: 80, 
+    height: 80, 
   },
-  messageContainer: {
-    marginTop: 20,
+  buttonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
-  messageText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Colors.black,
-  },
-  buttonContainer: {
-    marginTop: 30,
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: Colors.blue,
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    justifyContent:'center',
-    alignItems:'center',
-    width:'100%'
-,  },
   buttonText: {
-    fontSize: 18,
-    fontWeight: "600",
     color: Colors.white,
-
+    fontSize: 18,
+    fontWeight: "bold",
   },
+  Txt:{
+    color: Colors.black,
+    fontSize: 80,
+    fontFamily:'Nithya',
+  }
 });
 
-export default LetterPage;
+export default VoicePage;
