@@ -1,45 +1,85 @@
+import { View } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+export default function Layout() {
+  const [showTabBar, setShowTabBar] = useState(true);
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    // You can place any logic here to control the visibility globally
+  }, []);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          backgroundColor: Colors.bgColor,
+          borderTopWidth: 0,
+          marginBottom: 20,
+          padding: 0,
+          display: showTabBar ? 'flex' : 'none', // Dynamically control visibility
+        },
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: Colors.black,
+        tabBarInactiveTintColor: Colors.grey,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="camera-outline" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen name="letter"
+       options={{
+        tabBarStyle: { display: 'none' }, // Hide tab bar when focused
+      }}
+      listeners={{
+        focus: () => {
+          setShowTabBar(false); // Hide tab bar when focused on voicelearn
+        },
+        blur: () => {
+          setShowTabBar(true); // Show tab bar when blurred from voicelearn
+        },
+      }}
+      />
+      <Tabs.Screen
+        name="arvr"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <View
+              style={{
+                backgroundColor: Colors.primaryColor,
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 10,
+                height: 50,
+              }}
+            >
+              <Ionicons name="camera" size={24} color={color} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="voicelearn"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarStyle: { display: 'none' }, // Hide tab bar when focused
+        }}
+        listeners={{
+          focus: () => {
+            setShowTabBar(false); // Hide tab bar when focused on voicelearn
+          },
+          blur: () => {
+            setShowTabBar(true); // Show tab bar when blurred from voicelearn
+          },
         }}
       />
+      <Tabs.Screen name="wordmatch" />
     </Tabs>
   );
 }
