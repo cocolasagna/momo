@@ -6,7 +6,7 @@ const WelcomeScreen = () => {
     const navigation = useNavigation();
   const handleContinue = () => {
     console.log("Continue pressed");
-    navigation.navigate("welcome");
+    navigation.navigate("firstpage");
     // Add navigation logic or desired action
   };
 
