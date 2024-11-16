@@ -81,7 +81,7 @@ const VoicePage = () => {
       // Change the background color of the selected card based on correctness
       setCardColors((prevColors) => ({
         ...prevColors,
-        [selectedCard]: isCorrect ? Colors.green : "red", // Instant color change on selected card
+        [selectedCard]: isCorrect ? Colors.green : Colors.red, // Instant color change on selected card
       }));
     }
   };

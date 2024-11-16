@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 2,
     marginHorizontal: 20,
+    fontFamily:'Nithya',
   },
   button: {
     backgroundColor: "#9B1C1C", // Button dark red
